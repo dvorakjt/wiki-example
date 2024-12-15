@@ -1,41 +1,18 @@
-name: GitHub Wiki upload
-
+name: Publish wiki
 on:
   push:
-    branches:
-      - main
-    paths: [wiki/**, .github/workflows/wiki.yml]
-
+    branches: [main]
+    paths:
+      - wiki/**
+      - .github/workflows/publish-wiki.yml
 concurrency:
-  group: wiki
+  group: publish-wiki
   cancel-in-progress: true
-
 permissions:
   contents: write
-
 jobs:
-  wiki:
-    name: Publish to GitHub Wiki
+  publish-wiki:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          repository: ${{github.repository}}
-          path: ${{github.repository}}
-
-      - name: Checkout Wiki
-        uses: actions/checkout@v4
-        with:
-          repository: ${{github.repository}}.wiki
-          path: ${{github.repository}}.wiki
-
-      - name: Push to wiki
-        run: |
-          set -e
-          cd $GITHUB_WORKSPACE/${{github.repository}}.wiki
-          cp -r $GITHUB_WORKSPACE/${{github.repository}}/wiki/* .
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git diff-index --quiet HEAD || git commit -m "action: wiki sync" && git push
+      - uses: actions/checkout@v3
+      - uses: Andrew-Chen-Wang/github-wiki-action@v4
